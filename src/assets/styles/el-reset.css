@@ -1,0 +1,23 @@
+.home .el-carousel {
+    width: 300px;
+}
+
+/* 登录页 表单输入框样式 */
+.login-page .el-input__inner{
+    width: 85%;
+}
+/* 表单X号样式 */
+.login-page .el-input__suffix{
+    right: 50px;
+}
+/* 表单文本样式 */
+.login-page .el-form-item__label{
+    color: #fff;
+}
+/* 输入框样式 */
+.login-page .el-input__inner{
+    outline: 0;
+    border: 1px solid #fff;
+    color: #fff;
+    background-color: rgba(0,0,0,.1);
+}
