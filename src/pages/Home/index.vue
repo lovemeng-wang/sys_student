@@ -53,23 +53,28 @@
             <el-col :span="6">
               <div class="grid-content bg-purple">
                 <el-radio-group v-model="isCollapse">
-                  <el-radio-button :label="false" v-if="isCollapse">
+                  <el-radio-button v-show="isCollapse" :label="false">
                     <i class="el-icon-s-unfold"></i>
                   </el-radio-button>
-                  <el-radio-button :label="true" v-else>
+                  <el-radio-button v-show="!isCollapse" :label="true">
                     <i class="el-icon-s-fold"></i>
                   </el-radio-button>
                 </el-radio-group>
               </div>
             </el-col>
             <el-col :span="6">
-              <div class="grid-content bg-purple-light">千峰管理系统</div>
+              <div class="grid-content">万峰智慧管理系统</div>
             </el-col>
             <el-col :span="6">
-              <div class="grid-content bg-purple">
-                <img src="" alt="" />
-                欢迎你：<span>王五 </span>
-                <a href="#">退出</a>
+              <div class="grid-content">
+                <el-avatar
+                  size="large"
+                  fit="cover"
+                  src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=299848528,4021999190&fm=11&gp=0.jpg"
+                ></el-avatar>
+                <span>欢迎你：</span>
+                <b class="nickname">{{ userInfo.nickname }}</b>
+                <span class="quit" @click="quit">退出</span>
               </div>
             </el-col>
           </el-row>
@@ -81,7 +86,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 /* 侧边栏logo */
 .logo {
   height: 60px;
@@ -142,31 +147,34 @@ body > .el-container {
 .el-col {
   border-radius: 4px;
 }
-.bg-purple-dark {
-  /* background: #99a9bf; */
-}
+/* .bg-purple-dark {
+  background: #99a9bf;
+} */
 .bg-purple {
   height: 60px;
   box-sizing: border-box;
   position: relative;
   /* background: #d3dce6; */
 }
-.bg-purple-light {
-  /* background: #e5e9f2; */
-}
+/* .bg-purple-light {
+  background: #e5e9f2;
+} */
 .grid-content {
   border-radius: 4px;
   min-height: 36px;
 }
-.row-bg {
-  /* background-color: #f9fafc; */
-}
+/* .row-bg {
+  background-color: #f9fafc;
+} */
+
+
 
 /* 菜单按钮 */
 .el-radio-group {
   position: absolute;
   left: 0;
-  top: 10px;
+  top: 5px;
+  bottom: 5px;
 }
 
 /* 导航菜单样式 */
@@ -177,17 +185,44 @@ body > .el-container {
 .el-submenu__title {
   text-align: left;
 }
-.el-menu-item-group__title{
+.el-menu-item-group__title {
   display: none;
+}
+.grid-content {
+  height: 60px;
+  box-sizing: border-box;
+  padding: 0;
+  vertical-align: middle;
+}
+.el-avatar {
+  vertical-align: middle;
+  margin: 0px 10px 5px 0;
+}
+.el-avatar > img {
+  margin: 0;
+  padding: 0;
+}
+.quit {
+  padding-left: 10px;
+  cursor: pointer;
+}
+.nickname {
+  font-size: 20px;
+  font-family: "宋体";
 }
 </style>
 
 <script>
+import { getLoginLog } from "@/api";
+import { mapState } from "vuex";
 export default {
   data() {
     return {
       isCollapse: true,
     };
+  },
+  computed: {
+    ...mapState(["userInfo"]),
   },
   methods: {
     handleOpen(key, keyPath) {
@@ -196,6 +231,19 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
+    quit() {
+      // 退出登录
+      // 1. 清除token和userinfo
+      // 2. 跳转到登录页
+      localStorage.removeItem("sys_token");
+      localStorage.removeItem("sys_userInfo");
+      this.$router.push("/login");
+    },
+  },
+  mounted() {
+    getLoginLog().then((res) => {
+      console.log(res);
+    });
   },
 };
 </script>

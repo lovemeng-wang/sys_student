@@ -44,7 +44,15 @@
 </template>
 
 <script>
+import { login } from "@/api";
+import {mapMutations} from "vuex"
 export default {
+  // 登录逻辑的实现
+  // 1.收集用户输入的username&password传递到后端
+  // 2.登录通过后，将后端返回的token存到本地
+  // 3.每次请求时要携带token
+  // 4.展示token校验正确的数据
+  // 5.校验不通过是跳转回登录页
   data() {
     /**
      * jsDOc
@@ -83,6 +91,7 @@ export default {
     };
   },
   methods: {
+    ...mapMutations(['SET_USERINFO']),
     submitForm(formName) {
       /**
        * @param {Function} validate 校验的方法
@@ -91,7 +100,35 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           //本地校验通过
-          alert("submit!");
+
+          // 打开 登录加载动画
+          const loading = this.$loading({
+            lock: true,
+            text: "Loading",
+            spinner: "el-icon-loading",
+            background: "rgba(0, 0, 0, 0.7)",
+          })
+          let { username, password } = this.loginForm;
+          login(username, password)
+            .then((res) => {
+              console.log(res);
+              // 得到服务器响应，关掉loading动画
+              loading.close();
+              if (res.data.state) {
+                this.$message.success("登录成功")
+                localStorage.setItem("sys_token", res.data.token);
+                localStorage.setItem("sys_userInfo",JSON.stringify(res.data.userInfo))
+                // 更改vuex中的state['userInfo']的值
+                this.SET_USERINFO(res.data.userInfo)
+                // 跳转到主页
+                this.$router.push("/");
+              } else {
+                this.$message.error('用户名或密码错误');
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         } else {
           console.log("error submit!!");
           return false;
@@ -120,13 +157,17 @@ export default {
 }
 /* 背景视频样式 */
 .bg-video {
-  height: 100%;
   position: absolute;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  top: 0;
-  z-index: -1;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -100;
+  background-size: cover;
 }
 /* 表单区域样式 */
 .login-container {
@@ -152,10 +193,13 @@ h1 {
 .el-button:hover {
   background: linear-gradient(90deg, #959599, #012454);
 }
-
+.el-button--primary {
+  background: linear-gradient(90deg, #959599, #012454);
+}
 /* 左边图片 */
-/* .left{
-    width: 50%;
-    background-image: url(/assets/imgs/bg2.png);
-} */
+.left {
+  width: 50%;
+  height: 100%;
+  background: url("../..//assets/imgs/bg2.png") no-repeat 50% center/50%;
+}
 </style>
